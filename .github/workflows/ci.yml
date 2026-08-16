@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  ruff:
+    name: Ruff
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: Install ruff
+        run: pip install ruff
+
+      - name: Run ruff check
+        run: ruff check .
+
+      - name: Run ruff format --check
+        run: ruff format --check .
+
+  tests:
+    name: Tests
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+
+    steps:
+      # Se hace checkout de este repo y del real libredte-lib-core-dispatcher
+      # como hermanos, dentro del mismo workspace — replica el layout de
+      # desarrollo local (ambos bajo _bridge-libredte/) del que depende
+      # tests/conftest.py para ubicar el autoload.php.
+      - name: Check out this repository
+        uses: actions/checkout@v4
+        with:
+          path: libredte-lib-core-bridge-python
+
+      - name: Check out libredte-lib-core-dispatcher
+        uses: actions/checkout@v4
+        with:
+          repository: libredte/libredte-lib-core-dispatcher
+          path: libredte-lib-core-dispatcher
+
+      # Solo para correr `composer install` de libredte-lib-core-dispatcher
+      # — libredte-lib-core y derafu/backbone-dispatcher son públicos, se
+      # resuelven vía Packagist sin credenciales. La corrida de tests en sí
+      # ocurre dentro de la imagen con `phpy` más abajo, que trae su propio
+      # intérprete PHP (compilado con --enable-embed).
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          tools: composer
+
+      - name: Install libredte-lib-core-dispatcher dependencies
+        run: composer install --no-interaction --prefer-dist
+        working-directory: libredte-lib-core-dispatcher
+
+      # Publicada por el propio workflow de derafu/docker-python3.14-caddy-server,
+      # no se construye acá — construirla en cada corrida implicaría
+      # recompilar PHP desde código fuente (`--enable-embed`) cada vez.
+      - name: Pull the phpy-enabled image
+        run: docker pull ghcr.io/derafu/docker-python3.14-caddy-server:phpy
+
+      - name: Run tests inside the phpy-enabled container
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}:/work" \
+            -w /work/libredte-lib-core-bridge-python \
+            ghcr.io/derafu/docker-python3.14-caddy-server:phpy \
+            bash -c "
+              python3 -m venv --system-site-packages .venv &&
+              .venv/bin/pip install --upgrade pip &&
+              .venv/bin/pip install -e '.[dev]' &&
+              .venv/bin/pytest -v
+            "
