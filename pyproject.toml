@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "libredte-lib-core-bridge"
-version = "0.2.0"
+version = "0.2.1"
 description = "Bridge Python para la biblioteca real libredte/libredte-lib-core, vía libredte-lib-core-dispatcher."
 readme = "README.rst"
 license = { file = "COPYING" }
