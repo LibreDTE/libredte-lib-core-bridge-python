@@ -13,7 +13,7 @@ import os
 
 import pytest
 
-from libredte_lib_core_bridge import Dispatcher
+from libredte_lib_core_bridge import Dispatcher, Explorer
 
 _AUTOLOAD_PATH = os.path.join(
     os.path.dirname(__file__),
@@ -35,3 +35,9 @@ def autoload_path():
 def dispatcher(autoload_path):
     """Construye un `Dispatcher` nuevo contra el checkout real hermano."""
     return Dispatcher(autoload_path=autoload_path)
+
+
+@pytest.fixture
+def explorer(autoload_path):
+    """Construye un `Explorer` nuevo contra el checkout real hermano."""
+    return Explorer(autoload_path=autoload_path)

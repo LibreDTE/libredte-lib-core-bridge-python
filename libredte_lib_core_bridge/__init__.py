@@ -2,5 +2,6 @@
 
 from .dispatcher import Dispatcher
 from .exceptions import LibredteLibCoreError
+from .explorer import Explorer
 
-__all__ = ['Dispatcher', 'LibredteLibCoreError']
+__all__ = ['Dispatcher', 'Explorer', 'LibredteLibCoreError']
