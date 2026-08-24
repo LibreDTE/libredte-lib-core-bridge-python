@@ -14,14 +14,18 @@ Uso
 
     dispatcher = Dispatcher()  # environment='prod', debug=False por defecto
 
-    caf = dispatcher.dispatch(
-        'billing.identifier.caf_loader:load',
+    result = dispatcher.dispatch(
+        'billing.identifier.caf_loader::load',
         xml=xml_base64,
     )
+    caf = result.value
+    result.metadata  # ExecutionMetadata: tiempo, memoria, etc.
 
 ``dispatch()`` nunca deja pasar un error de PHP sin tipar: lanza una excepción
 Python (``derafu_backbone_bridge.BackboneBridgeError`` o una de sus
-subclases) en vez de una excepción PHP cruda.
+subclases) en vez de una excepción PHP cruda. Esa excepción carga el
+``Problem``/``ExecutionMetadata`` reales detrás del error (``.problem``,
+``.metadata``), no solo un mensaje y un nombre de clase.
 
 Arquitectura
 ------------
@@ -48,7 +52,7 @@ Los tests requieren ``phpy`` (solo disponible dentro del contenedor
 una instalación real de ``libredte-lib-core-dispatcher`` (con sus propias
 dependencias de Composer) accesible en disco. No usan ningún fixture
 externo: generan un CAF real y válido en memoria vía el propio
-``caf_faker:create`` de ``libredte-lib-core``.
+``caf_faker::create`` de ``libredte-lib-core``.
 
 Términos y condiciones de uso
 ------------------------------
