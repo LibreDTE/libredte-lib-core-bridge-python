@@ -23,6 +23,9 @@ class Explorer(GenericExplorer):
     `ExceptionRegistry` ya cubre por default.
     """
 
+    # Leído vía `self._BOOTSTRAP_CLASS` (no `Explorer._BOOTSTRAP_CLASS`) a
+    # propósito: una subclase lo extiende reasignando este mismo nombre de
+    # atributo, sin tocar `__init__` (ver `Dispatcher._BOOTSTRAP_CLASS`).
     _BOOTSTRAP_CLASS = 'libredte\\lib\\CoreDispatcher\\Bootstrap'
 
     def __init__(

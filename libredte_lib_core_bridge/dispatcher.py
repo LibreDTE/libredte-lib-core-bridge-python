@@ -21,12 +21,23 @@ class Dispatcher(GenericDispatcher):
     worker y operación a través del `dispatch()` heredado.
     """
 
+    # Leído vía `self._BOOTSTRAP_CLASS` (no `Dispatcher._BOOTSTRAP_CLASS`)
+    # a propósito: una subclase lo extiende reasignando este mismo nombre
+    # de atributo, sin tocar `__init__`.
     _BOOTSTRAP_CLASS = 'libredte\\lib\\CoreDispatcher\\Bootstrap'
 
     # Namespaces de PHP cuyas excepciones se agrupan bajo
     # `LibredteLibCoreError` — no solo las propias de `libredte-lib-core`,
     # también las de las bibliotecas Derafu que sus Deserializer envuelven
     # directamente sin atraparlas (ver docstring de `LibredteLibCoreError`).
+    #
+    # Leído vía `self._DOMAIN_NAMESPACES` igual que `_BOOTSTRAP_CLASS`, pero
+    # con una trampa: una subclase que quiera *agregar* sus propios
+    # namespaces NO debe reasignar este mismo atributo — lo pisaría
+    # (shadowing), perdiendo silenciosamente los de esta clase. Debe usar
+    # su propio nombre de atributo (p. ej. `_OWN_DOMAIN_NAMESPACES`) y, en
+    # su propio `__init__`, registrar ambos conjuntos sobre el mismo
+    # `ExceptionRegistry` antes de llamar a `super().__init__()`.
     _DOMAIN_NAMESPACES = (
         'libredte\\lib\\Core\\',
         'Derafu\\Xml\\',
