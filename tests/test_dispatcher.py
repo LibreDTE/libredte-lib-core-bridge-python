@@ -40,9 +40,9 @@ def test_dispatch_creates_and_loads_a_real_caf(dispatcher):
         xml=fake_caf['xml'],
     ).value
 
-    assert caf['tipoDocumento'] == _TIPO_DOCUMENTO
-    assert caf['folioDesde'] == _FOLIO_DESDE
-    assert caf['folioHasta'] == _FOLIO_HASTA
+    assert caf['tipo_documento'] == _TIPO_DOCUMENTO
+    assert caf['folio_desde'] == _FOLIO_DESDE
+    assert caf['folio_hasta'] == _FOLIO_HASTA
 
 
 def test_dispatch_raises_libredte_lib_core_error_for_a_domain_failure(
@@ -99,4 +99,4 @@ def test_default_constructor_falls_back_to_the_env_var(
         folioHasta=_FOLIO_HASTA,
     ).value
 
-    assert fake_caf['tipoDocumento'] == _TIPO_DOCUMENTO
+    assert fake_caf['tipo_documento'] == _TIPO_DOCUMENTO
